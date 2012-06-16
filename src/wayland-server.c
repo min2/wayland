@@ -112,9 +112,9 @@ destroy_client(void *data)
 WL_EXPORT void
 wl_resource_post_event(struct wl_resource *resource, uint32_t opcode, ...)
 {
-	struct wl_closure *closure;
+	struct wl_closure *closure = NULL;
 	struct wl_object *object = &resource->object;
-	va_list ap;
+	va_list ap = NULL;
 
 	va_start(ap, opcode);
 	closure = wl_closure_vmarshal(object, opcode, ap,

@@ -455,6 +455,8 @@ wl_closure_vmarshal(struct wl_object *sender,
 	if (closure == NULL)
 		return NULL;
 
+	memset(closure, 0, sizeof *closure + 1024);
+
 	extra_size = wl_message_size_extra(message);
 	count = arg_count_for_signature(signature) + 2;
 	extra = (char *) closure->buffer;
