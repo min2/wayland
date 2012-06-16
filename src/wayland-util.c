@@ -29,6 +29,15 @@
 #include "wayland-util.h"
 #include "wayland-private.h"
 
+/*
+	preconditions:	list is a valid pointer to wl_list
+	postconditions:	list ->next and ->prev points to list
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_list_init(struct wl_list *list)
 {
@@ -36,6 +45,15 @@ wl_list_init(struct wl_list *list)
 	list->next = list;
 }
 
+/*
+	preconditions:	list, elm are a valid pointers to wl_list
+	postconditions:	list->next is elm
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_list_insert(struct wl_list *list, struct wl_list *elm)
 {
@@ -45,6 +63,15 @@ wl_list_insert(struct wl_list *list, struct wl_list *elm)
 	elm->next->prev = elm;
 }
 
+/*
+	preconditions:	.
+	postconditions:	.
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_list_remove(struct wl_list *elm)
 {
@@ -54,6 +81,15 @@ wl_list_remove(struct wl_list *elm)
 	elm->prev = NULL;
 }
 
+/*
+	preconditions:	list and all next until list are valid pointers to wl_list
+	postconditions:	if terminates, returns the number of elements behind list until list again
+	terminates:	if there is no loop from Nx+y back to Nx where Nx > list.
+	worst time:	O(N)
+	average time:	O(N)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT int
 wl_list_length(struct wl_list *list)
 {
@@ -70,12 +106,30 @@ wl_list_length(struct wl_list *list)
 	return count;
 }
 
+/*
+	preconditions:	list is a valid pointer to wl_list
+	postconditions:	none
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT int
 wl_list_empty(struct wl_list *list)
 {
 	return list->next == list;
 }
 
+/*
+	preconditions:	other is a valid pointer to wl_list
+	postconditions:	.
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_list_insert_list(struct wl_list *list, struct wl_list *other)
 {
@@ -88,12 +142,26 @@ wl_list_insert_list(struct wl_list *list, struct wl_list *other)
 	list->next = other->next;
 }
 
+/*
+	preconditions:	array is a valid pointer to wl_array
+	postconditions:	array is zeroed, all pointers inside are invalid
+	terminates:	always
+*/
 WL_EXPORT void
 wl_array_init(struct wl_array *array)
 {
 	memset(array, 0, sizeof *array);
 }
 
+/*
+	preconditions:	array is a valid pointer to wl_array
+	postconditions:	array->data is an invalid pointer
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_array_release(struct wl_array *array)
 {
