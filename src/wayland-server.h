@@ -28,6 +28,8 @@ extern "C" {
 #endif
 
 #include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include "wayland-util.h"
 #include "wayland-version.h"
@@ -133,15 +135,41 @@ struct wl_signal {
 	struct wl_list listener_list;
 };
 
+
+static inline void
+wl_signal_dump(struct wl_signal *signal, void *data)
+{
+	struct wl_listener *l, *next;
+
+	fprintf(stderr, "%s(signal=%p, data=%p)\n", __func__, signal, data);
+
+	for (
+	l = 0,
+	next = 0,
+	     l = __wl_container_of((&signal->listener_list)->next, l, link),
+	     next = __wl_container_of((l)->link.next, next, link);
+	     &l->link != (&signal->listener_list);
+	     l = next,
+	     next = __wl_container_of(l->link.next, next, link))
+
+		fprintf(stderr, "\t(signal=%p, data=%p) "
+				"notify=%p, l=%p\n", signal, data, l->notify, l);
+}
+
 static inline void
 wl_signal_init(struct wl_signal *signal)
 {
+	fprintf(stderr, "%s(signal=%p)\n",__func__, signal);
+
 	wl_list_init(&signal->listener_list);
 }
 
 static inline void
 wl_signal_add(struct wl_signal *signal, struct wl_listener *listener)
 {
+	fprintf(stderr, "%s(signal=%p, listener=%p) notify=%p\n",__func__, signal, listener, listener->notify);
+	wl_signal_dump(signal, NULL);
+
 	wl_list_insert(signal->listener_list.prev, &listener->link);
 }
 

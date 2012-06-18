@@ -93,9 +93,13 @@ wl_data_source_send_offer(struct wl_data_source *source,
 	struct wl_data_offer *offer;
 	char **p;
 
+	fprintf(stderr, "%s(source=%p, target=%p)\n", __func__, source, target);
+
 	offer = malloc(sizeof *offer);
 	if (offer == NULL)
 		return NULL;
+
+	memset(offer, 0, sizeof *offer);
 
 	offer->resource.destroy = destroy_data_offer;
 	offer->resource.object.id = 0;
@@ -106,7 +110,9 @@ wl_data_source_send_offer(struct wl_data_source *source,
 	wl_signal_init(&offer->resource.destroy_signal);
 
 	offer->source = source;
+
 	offer->source_destroy_listener.notify = destroy_offer_data_source;
+
 	wl_signal_add(&source->resource.destroy_signal,
 		      &offer->source_destroy_listener);
 
@@ -308,6 +314,8 @@ data_device_start_drag(struct wl_client *client, struct wl_resource *resource,
 
 	/* FIXME: Check that the data source type array isn't empty. */
 
+	fprintf(stderr, "%s()\n", __func__);
+
 	seat->drag_grab.interface = &drag_grab_interface;
 
 	seat->drag_client = client;
@@ -363,6 +371,8 @@ wl_seat_set_selection(struct wl_seat *seat, struct wl_data_source *source,
 	struct wl_resource *data_device, *offer;
 	struct wl_resource *focus = NULL;
 
+	fprintf(stderr, "%s(seat=%p, source=%p, serial=%u)\n", __func__, seat, source, serial);
+
 	if (seat->selection_data_source &&
 	    seat->selection_serial - serial < UINT32_MAX / 2)
 		return;
@@ -407,6 +417,8 @@ data_device_set_selection(struct wl_client *client,
 {
 	if (!source_resource)
 		return;
+
+	fprintf(stderr, "%s(client=%p, resource=%p, source_resource=%p, serial=%u)\n", __func__, client, resource, source_resource, serial);
 
 	/* FIXME: Store serial and check against incoming serial here. */
 	wl_seat_set_selection(resource->data, source_resource->data,
@@ -466,12 +478,19 @@ create_data_source(struct wl_client *client,
 		return;
 	}
 
+	memset(source, 0, sizeof *source);
+
+	fprintf(stderr, "%s(client=%p, resource=%p) source=\\n", __func__, client, resource, source);
+
 	source->resource.destroy = destroy_data_source;
 	source->resource.object.id = id;
 	source->resource.object.interface = &wl_data_source_interface;
 	source->resource.object.implementation =
 		(void (**)(void)) &data_source_interface;
 	source->resource.data = source;
+
+	fprintf(stderr, "Tu initujeme nasu strukturu destroy_signal= %p\n", &source->resource.destroy_signal);
+
 	wl_signal_init(&source->resource.destroy_signal);
 
 	source->accept = client_source_accept;
