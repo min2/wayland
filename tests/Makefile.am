@@ -1,4 +1,5 @@
 TESTS =						\
+	my-test					\
 	array-test				\
 	client-test				\
 	connection-test				\
@@ -19,6 +20,7 @@ noinst_PROGRAMS =				\
 
 test_runner_src = test-runner.c test-runner.h test-helpers.c
 
+my_test_SOURCES = my-test.c $(test_runner_src)
 array_test_SOURCES = array-test.c $(test_runner_src)
 client_test_SOURCES = client-test.c $(test_runner_src)
 connection_test_SOURCES = connection-test.c $(test_runner_src)

@@ -46,7 +46,7 @@ wl_list_init(struct wl_list *list)
 }
 
 /*
-	preconditions:	list, elm are a valid pointers to wl_list
+	preconditions:	list, list->next, elm are a valid pointers to wl_list
 	postconditions:	list->next is elm
 	terminates:	always
 	worst time:	O(1)
@@ -77,6 +77,8 @@ wl_list_remove(struct wl_list *elm)
 {
 	elm->prev->next = elm->next;
 	elm->next->prev = elm->prev;
+
+	/* in performance oriented implementation, this is unnecessary I guess*/
 	elm->next = NULL;
 	elm->prev = NULL;
 }
@@ -167,7 +169,21 @@ wl_array_release(struct wl_array *array)
 {
 	free(array->data);
 }
-
+/*
+	preconditions:	array is a valid pointer to wl_array
+			before first run, array->alloc must be 0
+			array->alloc must be the real allocated size
+			and array->size must be the correct payload size too..
+	postconditions:	if returns NULL, nothing in memory changed
+			otherwise, the array->alloc and array->size are correct
+			and array->data is correct pointer and return value
+			represents the beginning of the added bytes
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void *
 wl_array_add(struct wl_array *array, size_t size)
 {
@@ -189,7 +205,7 @@ wl_array_add(struct wl_array *array, size_t size)
 			data = malloc(alloc);
 
 		if (data == NULL)
-			return 0;
+			return NULL;
 		array->data = data;
 		array->alloc = alloc;
 	}
@@ -199,12 +215,31 @@ wl_array_add(struct wl_array *array, size_t size)
 
 	return p;
 }
-
+/*
+	preconditions:	see wl_array_add(array)
+	postconditions:	array->data is an invalid pointer
+	terminates:	always
+	worst time:	O(1)
+	average time:	O(1)
+	worst space:	O(1)
+	average space:	O(1)
+*/
 WL_EXPORT void
 wl_array_copy(struct wl_array *array, struct wl_array *source)
 {
 	array->size = 0;
 	wl_array_add(array, source->size);
+	/* what to do when wl_array_add fails to realloc and returns NULL?*/
+	/* in that case, we should free the (array->data). it should be :
+
+	if (wl_array_add(array, source->size) == NULL)
+		free(array->data);
+	else
+		memcpy(array->data, source->data, source->size);
+
+	and the array->size==0 would signalize to the caller that
+	wl_array_copy() failed.
+	 */
 	memcpy(array->data, source->data, source->size);
 }
 
@@ -212,6 +247,7 @@ union map_entry {
 	uintptr_t next;
 	void *data;
 };
+
 
 WL_EXPORT void
 wl_map_init(struct wl_map *map)
@@ -343,6 +379,15 @@ wl_map_for_each(struct wl_map *map, wl_iterator_func_t func, void *data)
 	for_each_helper(&map->server_entries, func, data);
 }
 
+/*
+	preconditions:	-
+	postconditions:	-
+	terminates:	always
+	worst time:	O(0)
+	average time:	O(0)
+	worst space:	O(0)
+	average space:	O(0)
+*/
 static void
 wl_log_noop_handler(const char *fmt, va_list arg)
 {
