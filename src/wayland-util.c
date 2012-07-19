@@ -115,11 +115,14 @@ wl_array_add(struct wl_array *array, size_t size)
 		alloc *= 2;
 
 	if (array->alloc < alloc) {
+		if ((rand()&7) == 5) {
+			data = NULL;
+		} else {
 		if (array->alloc > 0)
 			data = realloc(array->data, alloc);
 	        else
 			data = malloc(alloc);
-
+		}
 		if (data == NULL)
 			return 0;
 		array->data = data;
